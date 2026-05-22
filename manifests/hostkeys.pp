@@ -52,9 +52,9 @@ class ssh::hostkeys (
   if $export_ipaddresses {
     $ipaddresses = ssh::ipaddresses($exclude_interfaces, $exclude_interfaces_re)
     $ipaddresses_real = $ipaddresses - $exclude_ipaddresses
-    $host_aliases = sort(unique(flatten([$fqdn_real, $hostname_real, $extra_aliases, $ipaddresses_real])))
+    $host_aliases = sort(unique(flatten([$hostname_real, $extra_aliases, $ipaddresses_real])))
   } else {
-    $host_aliases = sort(unique(flatten([$fqdn_real, $hostname_real, $extra_aliases])))
+    $host_aliases = sort(unique(flatten([$hostname_real, $extra_aliases])))
   }
 
   $storeconfigs_groups = $storeconfigs_group ? {
@@ -78,6 +78,7 @@ class ssh::hostkeys (
     if $key_type in $facts['ssh'] {
       @@sshkey { "${fqdn_real}_${key_type}":
         ensure       => present,
+        name         => $fqdn_real,
         host_aliases => $host_aliases,
         type         => $facts['ssh'][$key_type]['type'],
         key          => $facts['ssh'][$key_type]['key'],
